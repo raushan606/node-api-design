@@ -2,6 +2,10 @@ import express from 'express'
 import { json, urlencoded } from 'body-parser'
 import morgan from 'morgan'
 import cors from 'cors'
+import config from './config'
+import { connect } from 'mongoose'
+
+import itemRouter from './resources/item/item.router'
 
 export const app = express()
 
@@ -12,28 +16,15 @@ app.use(json())
 app.use(urlencoded({ extended: true }))
 app.use(morgan('dev'))
 
-const log = (req, res, next) => {
-  console.log('Logging')
-  next()
-}
+app.use('/api/item', itemRouter)
 
-// CRUD
-app.get('/data', (req, res, next) => {
-  res.send({ message: 'HELLO' })
-})
-
-app.put('/data', (req, res) => {
-  res.send(req.body)
-})
-
-app.delete()
-
-app.post('/data', log, (req, res) => {
-  res.send(req.body)
-})
-
-export const start = () => {
-  app.listen(3000, () => {
-    console.log('server is on 3000')
-  })
+export const start = async () => {
+  try {
+    await connect()
+    app.listen(config.port, () => {
+      console.log(`REST API on https://localhost:${config.port}`)
+    })
+  } catch (e) {
+    console.error(e)
+  }
 }
