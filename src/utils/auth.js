@@ -57,5 +57,20 @@ export const signin = async (req, res) => {
 }
 
 export const protect = async (req, res, next) => {
-  next()
+  let token = req.headers.authorization.split('Bearer ')[1]
+
+  if (!token) {
+    res.status(401).send({ message: 'no auth' })
+  }
+  try {
+    const payload = await verifyToken(token)
+    const user = await User.findById(payload.id)
+      .select('-password')
+      .exec()
+    res.user = user
+    next()
+  } catch (e) {
+    console.error(e)
+    return res.status(401).send({ message: 'no auth' })
+  }
 }
