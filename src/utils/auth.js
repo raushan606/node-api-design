@@ -60,7 +60,7 @@ export const protect = async (req, res, next) => {
   let token = req.headers.authorization.split('Bearer ')[1]
 
   if (!token) {
-    res.status(401).send({ message: 'no auth' })
+    res.status(401).end()
   }
   try {
     const payload = await verifyToken(token)
@@ -71,6 +71,6 @@ export const protect = async (req, res, next) => {
     next()
   } catch (e) {
     console.error(e)
-    return res.status(401).send({ message: 'no auth' })
+    return res.status(401).end()
   }
 }
