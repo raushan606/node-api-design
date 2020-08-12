@@ -57,6 +57,9 @@ export const signin = async (req, res) => {
 }
 
 export const protect = async (req, res, next) => {
+  if (!req.headers.authorization) {
+    return res.status(401).end()
+  }
   let token = req.headers.authorization.split('Bearer ')[1]
 
   if (!token) {
@@ -66,6 +69,7 @@ export const protect = async (req, res, next) => {
     const payload = await verifyToken(token)
     const user = await User.findById(payload.id)
       .select('-password')
+      .lean()
       .exec()
     res.user = user
     next()
